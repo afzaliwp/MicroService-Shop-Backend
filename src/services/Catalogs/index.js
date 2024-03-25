@@ -27,10 +27,6 @@ class CatalogsApp {
         this.db = await MongoDB.run();
     }
 
-    handleRoutes() {
-
-    }
-
     middlewares() {
         this.app.use(bodyParser.urlencoded({extended: false}));
         this.app.use(new Routes().router);

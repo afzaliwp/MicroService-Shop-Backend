@@ -1,8 +1,46 @@
 import express from 'express';
+import bodyParser from 'body-parser';
 import 'dotenv/config.js';
+import MongoDbSetup from "./db/index.js";
+import Routes from "./routes/index.js";
+import {catchErrorHandler} from "./middlewares/catch-error-handler.js";
 
-const app = express();
 
-app.listen( process.env.PORT, () => {
-    console.log(`Catalog service is running on port ${process.env.PORT}: http://localhost:${process.env.PORT}`)
-} );
+class CustomersApp {
+
+    // The app port.
+    port;
+
+    //express app instance.
+    app;
+
+    //The mongodb DB instance
+    db;
+
+    constructor() {
+        this.port = process.env.PORT;
+        this.app = express();
+    }
+
+    async bootstrap() {
+        const MongoDB = new MongoDbSetup();
+        this.db = await MongoDB.run();
+    }
+
+    middlewares() {
+        this.app.use(bodyParser.urlencoded({extended: false}));
+        this.app.use(new Routes().router);
+        this.app.use(catchErrorHandler);
+    }
+
+    main() {
+        this.middlewares();
+        this.app.listen(this.port, async () => {
+            await this.bootstrap();
+            console.log(`Customer service is running on port ${this.port}: http://localhost:${this.port}`)
+        });
+    }
+}
+
+const App = new CustomersApp();
+App.main();
