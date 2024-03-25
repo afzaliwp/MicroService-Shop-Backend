@@ -40,6 +40,16 @@ class ProductRoutes {
                 path: '/new',
                 controller: this.Controller.addNew,
             },
+            {
+                method: 'patch',
+                path: '/update/:id',
+                controller: this.Controller.update,
+            },
+            {
+                method: 'delete',
+                path: '/delete/:id',
+                controller: this.Controller.delete,
+            },
         ]
     }
 }
