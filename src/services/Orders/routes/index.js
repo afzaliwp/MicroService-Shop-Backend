@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import PaymentRoutes from './payments.js';
+import OrderRoutes from './orders.js';
 
 class Routes {
     constructor() {
@@ -8,7 +8,7 @@ class Routes {
     }
 
     handleRoutes() {
-        this.router.use('/payments', new PaymentRoutes().router);
+        this.router.use('/orders', new OrderRoutes().router);
     }
 }
 

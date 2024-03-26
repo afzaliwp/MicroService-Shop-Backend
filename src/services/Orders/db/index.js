@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import {PaymentModel} from "./schema/payment.js";
+import {OrderModel} from "./schema/order.js";
 
 class MongoDbSetup {
     constructor() {
@@ -25,7 +25,7 @@ class MongoDbSetup {
 
     async initializeModels() {
         const models = {};
-        models.paymentModel = new PaymentModel(this.db);
+        models.orderModel = new OrderModel(this.db);
 
         return models;
     }

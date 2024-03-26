@@ -1,16 +1,17 @@
-import mongoose from 'mongoose';
+import mongoose, {Types} from 'mongoose';
 import uniqueValidator from 'mongoose-unique-validator';
-import {ObjectId} from "mongodb";
 
 const STATUSES = {
     PENDING: 0,
-    FAILED: 1,
-    SUCCEED: 2,
+    PROCESSING: 1,
+    SHIPPED: 2,
+    FAILED: 3,
+    SUCCEED: 4,
 }
 
 const orderSchema = new mongoose.Schema({
     userId: {
-        type: ObjectId,
+        type: Types.ObjectId,
         required: [true, 'The user id field is required!'],
     },
     amount: {
@@ -23,8 +24,17 @@ const orderSchema = new mongoose.Schema({
     },
     status: {
         type: Number,
-        min: [0, `select one of these values corresponding to the order status: pending: ${STATUSES.PENDING}, failed: ${STATUSES.FAILED}, succeed: ${STATUSES.SUCCEED}`],
-        max: [STATUSES.length, `select one of these values corresponding to the order status: pending: ${STATUSES.PENDING}, failed: ${STATUSES.FAILED}, succeed: ${STATUSES.SUCCEED}`]
+        min: [0, `select one of these values corresponding to the order status: pending: ${STATUSES.PENDING}, failed: ${STATUSES.FAILED}, succeed: ${STATUSES.SUCCEED}, processing: ${STATUSES.PROCESSING}, shipped: ${STATUSES.SHIPPED}`],
+        max: [STATUSES.length - 1, `select one of these values corresponding to the order status: pending: ${STATUSES.PENDING}, failed: ${STATUSES.FAILED}, succeed: ${STATUSES.SUCCEED}, processing: ${STATUSES.PROCESSING}, shipped: ${STATUSES.SHIPPED}`]
+    },
+    paymentId: {
+        type: Types.ObjectId, //the Payment id related to this order.
+        required: false,
+        unique: true,
+    },
+    items: {
+        type: [Types.ObjectId], //an array of the Product ids in the order.
+        required: true,
     },
     createdAt: {
         type: Date,

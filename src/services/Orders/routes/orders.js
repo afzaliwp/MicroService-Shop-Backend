@@ -38,7 +38,7 @@ class OrderRoutes {
             {
                 method: 'get',
                 path: '/user-id/:userId',
-                controller: this.Controller.getOrderByUserId,
+                controller: this.Controller.getOrdersByUserId,
             },
             {
                 method: 'post',

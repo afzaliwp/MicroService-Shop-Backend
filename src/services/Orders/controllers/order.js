@@ -41,6 +41,8 @@ class OrderController {
             Order.amount = req.body.amount || Order.amount;
             Order.description = req.body.description || Order.description;
             Order.status = req.body.status || Order.status;
+            Order.paymentId = req.body.paymentId || Order.paymentId;
+            Order.items = req.body.items || Order.items;
             Order.updatedAt = new Date();
 
             // Save the updated Order
@@ -79,7 +81,7 @@ class OrderController {
             if (Types.ObjectId.isValid(req.params.param)) {
                 Order = await this.OrderModel.findById(req.params.param);
             } else {
-                Order = await this.OrderModel.findOne({
+                Order = await this.OrderModel.find({
                     $or: [
                         {amount: Number(req.params.param)},
                         {status: Number(req.params.param)},
@@ -93,9 +95,9 @@ class OrderController {
         }
     }
 
-    getOrderByUserId = async (req, res, next) => {
+    getOrdersByUserId = async (req, res, next) => {
         try {
-            const Order = await this.OrderModel.findOne({
+            const Order = await this.OrderModel.find({
                 userId: new Types.ObjectId(req.params.userId)
             });
 
