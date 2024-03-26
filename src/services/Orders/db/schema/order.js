@@ -8,7 +8,7 @@ const STATUSES = {
     SUCCEED: 2,
 }
 
-const paymentSchema = new mongoose.Schema({
+const orderSchema = new mongoose.Schema({
     userId: {
         type: ObjectId,
         required: [true, 'The user id field is required!'],
@@ -23,8 +23,8 @@ const paymentSchema = new mongoose.Schema({
     },
     status: {
         type: Number,
-        min: [0, `select one of these values corresponding to the payment status: pending: ${STATUSES.PENDING}, failed: ${STATUSES.FAILED}, succeed: ${STATUSES.SUCCEED}`],
-        max: [STATUSES.length - 1, `select one of these values corresponding to the payment status: pending: ${STATUSES.PENDING}, failed: ${STATUSES.FAILED}, succeed: ${STATUSES.SUCCEED}`]
+        min: [0, `select one of these values corresponding to the order status: pending: ${STATUSES.PENDING}, failed: ${STATUSES.FAILED}, succeed: ${STATUSES.SUCCEED}`],
+        max: [STATUSES.length, `select one of these values corresponding to the order status: pending: ${STATUSES.PENDING}, failed: ${STATUSES.FAILED}, succeed: ${STATUSES.SUCCEED}`]
     },
     createdAt: {
         type: Date,
@@ -36,8 +36,8 @@ const paymentSchema = new mongoose.Schema({
     }
 });
 
-paymentSchema.plugin(uniqueValidator, {message: 'The {PATH} is already used, try another one.'});
+orderSchema.plugin(uniqueValidator, {message: 'The {PATH} is already used, try another one.'});
 
-const PaymentModel = mongoose.model('Payment', paymentSchema);
+const OrderModel = mongoose.model('Order', orderSchema);
 
-export {PaymentModel};
+export {OrderModel};
