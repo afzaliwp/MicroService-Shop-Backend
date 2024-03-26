@@ -34,7 +34,7 @@ class CustomerController {
             const Customer = await CustomerModel.findById(req.params.id);
 
             if (!Customer) {
-                return res.status(404).send({ message: 'Customer not found' });
+                return res.status(404).send({message: 'Customer not found'});
             }
 
             // Update fields
@@ -62,7 +62,7 @@ class CustomerController {
             const Customer = await CustomerModel.findById(req.params.id);
 
             if (!Customer) {
-                return res.status(404).send({ message: 'Customer not found' });
+                return res.status(404).send({message: 'Customer not found'});
             }
 
             // Update fields
@@ -85,7 +85,7 @@ class CustomerController {
             const Customer = await CustomerModel.findById(req.params.id);
 
             if (!Customer) {
-                return res.status(404).json({ status: false, message: 'Customer not found.' });
+                return res.status(404).json({status: false, message: 'Customer not found.'});
             }
 
             const deleteResult = await CustomerModel.deleteOne({
