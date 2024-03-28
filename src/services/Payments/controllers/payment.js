@@ -19,9 +19,9 @@ class PaymentController {
 
     addNew = async (req, res, next) => {
         try {
-            const newProduct = this.PaymentModel(req.body);
-            const savedProduct = await newProduct.save();
-            res.json({status: true, ...savedProduct._doc});
+            const newPayment = this.PaymentModel(req.body);
+            const savedPayment = await newPayment.save();
+            res.json({status: true, ...savedPayment._doc});
         } catch (e) {
             console.error(e);
             next(e);

@@ -24,7 +24,8 @@ const paymentSchema = new mongoose.Schema({
     status: {
         type: Number,
         min: [0, `select one of these values corresponding to the payment status: pending: ${STATUSES.PENDING}, failed: ${STATUSES.FAILED}, succeed: ${STATUSES.SUCCEED}`],
-        max: [STATUSES.length - 1, `select one of these values corresponding to the payment status: pending: ${STATUSES.PENDING}, failed: ${STATUSES.FAILED}, succeed: ${STATUSES.SUCCEED}`]
+        max: [2, `select one of these values corresponding to the payment status: pending: ${STATUSES.PENDING}, failed: ${STATUSES.FAILED}, succeed: ${STATUSES.SUCCEED}`],
+        default: 0,
     },
     createdAt: {
         type: Date,

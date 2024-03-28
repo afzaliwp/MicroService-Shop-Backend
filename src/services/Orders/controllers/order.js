@@ -1,5 +1,6 @@
 import {OrderModel} from '../db/schema/order.js';
 import {Types} from 'mongoose';
+import axios from "axios";
 
 class OrderController {
 
@@ -19,9 +20,22 @@ class OrderController {
 
     addNew = async (req, res, next) => {
         try {
-            const newProduct = this.OrderModel(req.body);
-            const savedProduct = await newProduct.save();
-            res.json({status: true, ...savedProduct._doc});
+            await this.customerExists(req.body.userId, res);
+
+            req.body.status = Number(req.body.status);
+            req.body.items = JSON.parse(req.body.items);
+
+            await this.updateProducts(req.body.items, res);
+            req.body.paymentId = await this.createPayment(
+                {
+                    userId: req.body.userId,
+                    amount: req.body.amount
+                },
+                res
+            );
+            const newOrder = this.OrderModel(req.body);
+            const savedOrder = await newOrder.save();
+            res.json({status: true, ...savedOrder._doc});
         } catch (e) {
             console.error(e);
             next(e);
@@ -30,25 +44,24 @@ class OrderController {
 
     update = async (req, res, next) => {
         try {
-            const Order = await OrderModel.findById(req.params.id);
-
-            if (!Order) {
-                return res.status(404).send({message: 'Order not found'});
-            }
+            const Order = await this.orderExists(req.params.id, res);
 
             // Update fields
-            Order.userId = req.body.userId || Order.userId;
             Order.amount = req.body.amount || Order.amount;
             Order.description = req.body.description || Order.description;
             Order.status = req.body.status || Order.status;
-            Order.paymentId = req.body.paymentId || Order.paymentId;
             Order.items = req.body.items || Order.items;
             Order.updatedAt = new Date();
 
-            // Save the updated Order
-            const updatedProduct = await Order.save();
+            // If order has already a payment id, you can't change it.
+            if (!Order.paymentId) {
+                Order.paymentId = req.body.paymentId || Order.paymentId;
+            }
 
-            res.json({status: true, ...updatedProduct._doc});
+            // Save the updated Order
+            const updatedOrder = await Order.save();
+
+            res.json({status: true, ...updatedOrder._doc});
         } catch (e) {
             console.error(e);
             next(e);
@@ -106,6 +119,82 @@ class OrderController {
             console.error(e);
             next(e);
         }
+    }
+
+    async customerExists(userId, res) {
+        const {data: userData} = await axios.get(`${process.env.CUSTOMER_SERVICE}/customers/${userId}`);
+
+        if (!userData) {
+            return res.status(404).send({message: 'Customer not found!'});
+        }
+
+        return userData;
+    }
+
+    async orderExists(orderId, res) {
+        const Order = await OrderModel.findById(orderId);
+
+        if (!Order) {
+            return res.status(404).send({message: 'Order not found!'});
+        }
+
+        return Order;
+    }
+
+    async updateProducts(items, res) {
+        let okToUpdate = [];
+        for (const item of items) {
+            for (const productId of Object.keys(item)) {
+                const {data: product} = await axios.get(`${process.env.CATALOGS_SERVICE}/products/${productId}`);
+                const quantity = Number(item[productId]);
+                product.quantity = Number(product.quantity);
+
+                if (product.quantity <= 0 || product.quantity < quantity) {
+                    okToUpdate = [];
+                    return res.status(400).json({
+                        success: false,
+                        message: `Product ${product.title} has ${product.quantity} items in stock, you asked for ${quantity}.`
+                    });
+                }
+
+                okToUpdate.push({
+                    productId: productId,
+                    newQuantity: product.quantity - quantity,
+                })
+            }
+        }
+        if (okToUpdate) {
+            for (const item of okToUpdate) {
+                const {data} = await axios.patch(
+                    `${process.env.CATALOGS_SERVICE}/products/update/${item.productId}`,
+                    {
+                        quantity: item.newQuantity
+                    },
+                    {
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    }
+                );
+            }
+        }
+    }
+
+    async createPayment({userId, amount}, res) {
+        const {data} = await axios.post(
+            `${process.env.PAYMENTS_SERVICE}/payments/new`,
+            {
+                userId: userId,
+                amount: amount,
+            },
+            {
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            }
+        );
+
+        return data._id;
     }
 }
 

@@ -28,6 +28,7 @@ class PaymentsApp {
     }
 
     middlewares() {
+        this.app.use(express.json());
         this.app.use(bodyParser.urlencoded({extended: false}));
         this.app.use(new Routes().router);
         this.app.use(catchErrorHandler);

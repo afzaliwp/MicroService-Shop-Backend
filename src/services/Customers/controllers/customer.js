@@ -19,10 +19,10 @@ class CustomerController {
 
     addNew = async (req, res, next) => {
         try {
-            const newProduct = this.CustomerModel(req.body);
-            newProduct.passwordChanged = true;
-            const savedProduct = await newProduct.save();
-            res.json({status: true, ...savedProduct._doc});
+            const newCustomer = this.CustomerModel(req.body);
+            newCustomer.passwordChanged = true;
+            const savedCustomer = await newCustomer.save();
+            res.json({status: true, ...savedCustomer._doc});
         } catch (e) {
             console.error(e);
             next(e);

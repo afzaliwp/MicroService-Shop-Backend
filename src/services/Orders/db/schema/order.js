@@ -24,17 +24,16 @@ const orderSchema = new mongoose.Schema({
     },
     status: {
         type: Number,
-        min: [0, `select one of these values corresponding to the order status: pending: ${STATUSES.PENDING}, failed: ${STATUSES.FAILED}, succeed: ${STATUSES.SUCCEED}, processing: ${STATUSES.PROCESSING}, shipped: ${STATUSES.SHIPPED}`],
-        max: [STATUSES.length - 1, `select one of these values corresponding to the order status: pending: ${STATUSES.PENDING}, failed: ${STATUSES.FAILED}, succeed: ${STATUSES.SUCCEED}, processing: ${STATUSES.PROCESSING}, shipped: ${STATUSES.SHIPPED}`]
+        min: [0, `min: select one of these values corresponding to the order status: pending: ${STATUSES.PENDING}, failed: ${STATUSES.FAILED}, succeed: ${STATUSES.SUCCEED}, processing: ${STATUSES.PROCESSING}, shipped: ${STATUSES.SHIPPED}`],
+        max: [4, `max: select one of these values corresponding to the order status: pending: ${STATUSES.PENDING}, failed: ${STATUSES.FAILED}, succeed: ${STATUSES.SUCCEED}, processing: ${STATUSES.PROCESSING}, shipped: ${STATUSES.SHIPPED}`]
     },
     paymentId: {
         type: Types.ObjectId, //the Payment id related to this order.
         required: false,
-        unique: true,
     },
     items: {
-        type: [Types.ObjectId], //an array of the Product ids in the order.
-        required: true,
+        type: [Object],
+        required: true
     },
     createdAt: {
         type: Date,
