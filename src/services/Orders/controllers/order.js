@@ -1,11 +1,17 @@
 import {OrderModel} from '../db/schema/order.js';
 import {Types} from 'mongoose';
 import axios from "axios";
+import {grpcPaymentCall} from "../grpc/calls/payment.js";
 
 class OrderController {
 
+    OrderModel;
+
+    grpcPaymentCall;
+
     constructor() {
         this.OrderModel = OrderModel;
+        this.grpcPaymentCall = new grpcPaymentCall();
     }
 
     getOrders = async (req, res, next) => {
@@ -32,6 +38,34 @@ class OrderController {
                     amount: req.body.amount
                 },
                 res
+            );
+
+            //With gRPC Call.
+            req.body.paymentId = await this.createPaymentGrpc(
+                {
+                    userId: req.body.userId,
+                    amount: req.body.amount
+                }
+            );
+            const newOrder = this.OrderModel(req.body);
+            const savedOrder = await newOrder.save();
+            res.json({status: true, ...savedOrder._doc});
+        } catch (e) {
+            console.error(e);
+            next(e);
+        }
+    }
+
+    addNewGrpc = async (req, res, next) => {
+        try {
+            await this.customerExists(req.body.userId, res);
+
+            //With gRPC Call.
+            req.body.paymentId = await this.createPaymentGrpc(
+                {
+                    userId: req.body.userId,
+                    amount: req.body.amount
+                }
             );
             const newOrder = this.OrderModel(req.body);
             const savedOrder = await newOrder.save();
@@ -195,6 +229,25 @@ class OrderController {
         );
 
         return data._id;
+    }
+
+    async createPaymentGrpc({userId, amount}, res, ) {
+        try {
+            this.grpcPaymentCall.paymentClient.createPayment({userId, amount}, (error, response) => {
+                if (error) {
+                    return;
+                }
+
+                return response.id;
+            });
+        } catch (e) {
+            res.status(500).json({
+                success: false,
+                message: 'An unexpected error happened on gRPC server.',
+            });
+            console.error(e);
+        }
+
     }
 }
 

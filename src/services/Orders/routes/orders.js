@@ -46,6 +46,11 @@ class OrderRoutes {
                 controller: this.Controller.addNew,
             },
             {
+                method: 'post',
+                path: '/grpc/new',
+                controller: this.Controller.addNewGrpc,
+            },
+            {
                 method: 'patch',
                 path: '/update/:id',
                 controller: this.Controller.update,

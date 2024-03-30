@@ -3,6 +3,7 @@ import bodyParser from 'body-parser';
 import 'dotenv/config.js';
 import MongoDbSetup from "./db/index.js";
 import Routes from "./routes/index.js";
+import {grpcServer} from "./grpc/server.js";
 import {catchErrorHandler} from "./middlewares/catch-error-handler.js";
 
 
@@ -39,7 +40,14 @@ class PaymentsApp {
         this.app.listen(this.port, async () => {
             await this.bootstrap();
             console.log(`Payment service is running on port ${this.port}: http://localhost:${this.port}`)
+            this.runGRPC();
         });
+    }
+
+    runGRPC() {
+        const server = new grpcServer();
+
+        server.run();
     }
 }
 
